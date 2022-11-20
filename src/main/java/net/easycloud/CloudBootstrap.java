@@ -1,12 +1,17 @@
 package net.easycloud;
 
+import net.easycloud.packet.GlobalPacketListener;
+import net.easycloud.packet.Packet;
+import net.easycloud.packet.PacketManager;
+import net.easycloud.packet.factory.PacketManagerFactory;
+import net.easycloud.packet.list.HelloPacket;
+import net.easycloud.packet.list.JsonPacket;
+import net.easycloud.packet.list.PingPacket;
 import net.easycloud.server.CloudServer;
 import net.easycloud.server.factory.CloudServerFactory;
-import net.easycloud.session.packet.PacketManager;
-import net.easycloud.session.packet.factory.PacketManagerFactory;
-import net.easycloud.session.packet.list.HelloPacket;
 
 import java.io.IOException;
+import java.util.List;
 
 public class CloudBootstrap {
 
@@ -14,7 +19,11 @@ public class CloudBootstrap {
     private PacketManager packetManager;
 
     public void createServer() throws IOException {
+
         this.cloudServer = CloudServerFactory.create(this.packetManager);
+
+        new JsonPacket<>(List.of("hello world"));
+
     }
 
     public void start() {
@@ -27,6 +36,17 @@ public class CloudBootstrap {
 
     public void setupPackets() {
         this.packetManager = PacketManagerFactory.create();
-        this.packetManager.registerPacket(HelloPacket.class);
+        this.packetManager.setGlobalPacketListener(packet -> {
+
+            System.out.println("incomming packet: " + packet.getClass().getSimpleName());
+
+            if (packet instanceof JsonPacket<?>) {
+                JsonPacket<?> jsonPacket = (JsonPacket<?>) packet;
+                System.out.println("json:" + jsonPacket.toString());
+
+            }
+
+        });
+
     }
 }

@@ -1,6 +1,6 @@
 package net.easycloud.session;
 
-import net.easycloud.session.packet.Packet;
+import net.easycloud.packet.list.JsonPacket;
 import net.easycloud.session.runner.CloudSessionRunner;
 
 import java.io.IOException;
@@ -29,7 +29,8 @@ public class CloudSession {
 
     }
 
-    public void sendPacket(Packet packet) throws IOException {
+    public void sendPacket(JsonPacket<?> packet) throws IOException {
+
         this.runner.sendPacket(packet);
     }
 

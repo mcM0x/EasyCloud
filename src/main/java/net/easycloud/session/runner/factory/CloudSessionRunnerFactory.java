@@ -1,6 +1,6 @@
 package net.easycloud.session.runner.factory;
 
-import net.easycloud.session.packet.PacketManager;
+import net.easycloud.packet.PacketManager;
 import net.easycloud.session.runner.CloudSessionRunner;
 
 import java.io.DataInputStream;

@@ -1,8 +1,8 @@
 package net.easycloud.server;
 
+import net.easycloud.packet.PacketManager;
 import net.easycloud.session.CloudSession;
 import net.easycloud.session.factory.CloudSessionFactory;
-import net.easycloud.session.packet.PacketManager;
 import net.easycloud.session.runner.factory.CloudSessionRunnerFactory;
 import net.easycloud.session.sessionid.SessionIdFactory;
 
@@ -41,6 +41,12 @@ public class CloudServer implements Runnable {
             throw new RuntimeException(e);
         }
 
+        System.out.println("open server socket at *:" + this.port);
+
+        new Thread(() -> {
+
+        }, "").start();
+
         while (isRunning) {
 
             try {
@@ -67,7 +73,13 @@ public class CloudServer implements Runnable {
 
         }
     }
+
     public void stop() {
         this.isRunning = false;
     }
+
+    public void processSession(CloudSession session) {
+
+    }
+
 }
