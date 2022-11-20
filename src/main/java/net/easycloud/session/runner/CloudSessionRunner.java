@@ -42,12 +42,9 @@ public class CloudSessionRunner implements Runnable {
 
                 if (this.inputStream.available() > 0) {
                     int packetId = this.inputStream.readInt();
-                    System.out.println("incomming packet: " + packetId);
                     if (this.packetManager.existsPacketById(packetId)) {
                         Packet packet = this.packetManager.getPacketById(packetId).newInstance();
-                        System.out.println("instance: " + packet.getClass().getSimpleName());
                         packet.read(this.inputStream);
-                        System.out.println("sending to packetmanager: "+ this.packetManager);
                         packetManager.processPacket(packet);
 
                     }

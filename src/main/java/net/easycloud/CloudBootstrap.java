@@ -25,8 +25,6 @@ public class CloudBootstrap {
 
         this.cloudServer = CloudServerFactory.create(this.packetManager);
 
-        new JsonPacket<>(List.of("hello world"));
-
     }
 
     public void start() {
@@ -41,11 +39,9 @@ public class CloudBootstrap {
         this.packetManager = PacketManagerFactory.create();
         this.packetManager.setGlobalPacketListener(packet -> {
 
-            System.out.println("incomming packet: " + packet.getClass().getSimpleName());
 
             if (packet instanceof JsonPacket<?>) {
                 JsonPacket<?> jsonPacket = (JsonPacket<?>) packet;
-                System.out.println("json:" + jsonPacket.toString());
             }
 
         });
