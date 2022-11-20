@@ -38,4 +38,11 @@ public class CloudSession {
         new Thread(this.runner, "Session-Worker-" + this.sessionId).start();
     }
 
+    @Override
+    public String toString() {
+        return "CloudSession{" +
+                "socket=" + socket +
+                ", sessionId=" + sessionId +
+                '}';
+    }
 }

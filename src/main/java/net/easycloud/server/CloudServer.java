@@ -10,6 +10,8 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CloudServer implements Runnable {
 
@@ -20,6 +22,8 @@ public class CloudServer implements Runnable {
     private PacketManager packetManager;
 
     private boolean isRunning = false;
+
+    private Map<Socket, CloudSession> sessionMap = new ConcurrentHashMap<>();
 
     public CloudServer(ServerSocket serverSocket, String host, int port, PacketManager packetManager) {
         this.serverSocket = serverSocket;
@@ -59,10 +63,15 @@ public class CloudServer implements Runnable {
                                 CloudSessionRunnerFactory.create(
                                         new DataOutputStream(socket.getOutputStream()),
                                         new DataInputStream(socket.getInputStream()),
-                                        this.packetManager
+                                        this.packetManager,
+                                        socket
                                 ),
                                 SessionIdFactory.create(socket)
                         );
+
+                sessionMap.put(socket, session);
+
+                System.out.println("incomming connection to cloud... listening");
 
                 //listen to session
                 session.listen();
@@ -82,4 +91,7 @@ public class CloudServer implements Runnable {
 
     }
 
+    public Map<Socket, CloudSession> getSessionMap() {
+        return sessionMap;
+    }
 }

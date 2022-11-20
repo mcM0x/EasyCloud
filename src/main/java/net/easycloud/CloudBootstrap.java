@@ -1,25 +1,27 @@
 package net.easycloud;
 
-import net.easycloud.packet.GlobalPacketListener;
-import net.easycloud.packet.Packet;
+import net.easycloud.listener.PingListener;
 import net.easycloud.packet.PacketManager;
 import net.easycloud.packet.factory.PacketManagerFactory;
-import net.easycloud.packet.list.HelloPacket;
 import net.easycloud.packet.list.JsonPacket;
-import net.easycloud.packet.list.PingPacket;
 import net.easycloud.server.CloudServer;
 import net.easycloud.server.factory.CloudServerFactory;
+import net.easycloud.session.packet.SinglePacketListener;
 import net.easycloud.template.TemplateManager;
 import net.easycloud.template.factory.TemplateManagerFactory;
 
 import java.io.IOException;
+import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CloudBootstrap {
 
     private CloudServer cloudServer;
     private PacketManager packetManager;
     private TemplateManager templateManager;
+
+    private List<SinglePacketListener> packetListenerList = new CopyOnWriteArrayList<>();
 
     public void createServer() throws IOException {
 
@@ -37,15 +39,28 @@ public class CloudBootstrap {
 
     public void setupPackets() {
         this.packetManager = PacketManagerFactory.create();
-        this.packetManager.setGlobalPacketListener(packet -> {
+        this.packetManager.setGlobalPacketListener((socket, packet) -> {
 
 
             if (packet instanceof JsonPacket<?>) {
                 JsonPacket<?> jsonPacket = (JsonPacket<?>) packet;
+
+                for (SinglePacketListener singlePacketListener : packetListenerList) {
+                    if (singlePacketListener.listenTo() == this.packetManager.getPacketId(packet.getClass())) {
+                        singlePacketListener.listen(cloudServer.getSessionMap().get(socket), jsonPacket);
+                    }
+                }
+
             }
 
         });
 
+        addSinglePacketListener(new PingListener(this.packetManager));
+
+    }
+
+    public void addSinglePacketListener(SinglePacketListener listener) {
+        packetListenerList.add(listener);
     }
 
     public void setupTemplates() {

@@ -6,6 +6,7 @@ import net.easycloud.packet.PacketManager;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.net.Socket;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -20,10 +21,13 @@ public class CloudSessionRunner implements Runnable {
 
     private PacketManager packetManager;
 
-    public CloudSessionRunner(DataOutputStream outputStream, DataInputStream inputStream, PacketManager packetManager) {
+    private Socket socket;
+
+    public CloudSessionRunner(DataOutputStream outputStream, DataInputStream inputStream, PacketManager packetManager, Socket socket) {
         this.outputStream = outputStream;
         this.inputStream = inputStream;
         this.packetManager = packetManager;
+        this.socket = socket;
     }
 
     @Override
@@ -45,7 +49,7 @@ public class CloudSessionRunner implements Runnable {
                     if (this.packetManager.existsPacketById(packetId)) {
                         Packet packet = this.packetManager.getPacketById(packetId).newInstance();
                         packet.read(this.inputStream);
-                        packetManager.processPacket(packet);
+                        packetManager.processPacket(this.socket, packet);
 
                     }
                 }
