@@ -8,6 +8,7 @@ public class Main {
 
         CloudBootstrap bootstrap = new CloudBootstrap();
 
+        bootstrap.setupTemplates();
         bootstrap.setupPackets();
         bootstrap.createServer();
 
