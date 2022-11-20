@@ -13,6 +13,8 @@ public class CloudSession {
 
     private int sessionId;
 
+    private long ping;
+
     public CloudSession(Socket socket, CloudSessionRunner runner, int sessionId) {
         this.socket = socket;
         this.runner = runner;
@@ -44,5 +46,13 @@ public class CloudSession {
                 "socket=" + socket +
                 ", sessionId=" + sessionId +
                 '}';
+    }
+
+    public long getPing() {
+        return ping;
+    }
+
+    public void setPing(long ping) {
+        this.ping = ping;
     }
 }

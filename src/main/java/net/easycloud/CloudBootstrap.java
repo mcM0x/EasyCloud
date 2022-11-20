@@ -11,7 +11,6 @@ import net.easycloud.template.TemplateManager;
 import net.easycloud.template.factory.TemplateManagerFactory;
 
 import java.io.IOException;
-import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -55,7 +54,7 @@ public class CloudBootstrap {
 
         });
 
-        addSinglePacketListener(new PingListener(this.packetManager));
+        this.addSinglePacketListener(new PingListener(this.packetManager));
 
     }
 

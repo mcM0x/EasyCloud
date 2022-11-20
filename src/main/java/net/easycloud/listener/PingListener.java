@@ -20,6 +20,9 @@ public class PingListener implements SinglePacketListener {
 
         System.out.println("ping " + (System.currentTimeMillis() - payload) + "ms from session:" + session);
 
+        session.setPing(payload);
+
+
     }
 
     @Override
