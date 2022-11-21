@@ -1,15 +1,21 @@
 package net.easycloud;
 
+import net.easycloud.gameserver.GameServerManager;
+import net.easycloud.gameserver.factory.GameServerFactory;
+import net.easycloud.gameserver.factory.GameServerManagerFactory;
 import net.easycloud.listener.PingListener;
+import net.easycloud.listener.RegisterPacketListener;
 import net.easycloud.packet.PacketManager;
 import net.easycloud.packet.factory.PacketManagerFactory;
 import net.easycloud.packet.list.JsonPacket;
 import net.easycloud.server.CloudServer;
+import net.easycloud.gameserver.creator.ServerCreator;
 import net.easycloud.server.factory.CloudServerFactory;
 import net.easycloud.session.packet.SinglePacketListener;
 import net.easycloud.template.TemplateManager;
 import net.easycloud.template.factory.TemplateManagerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -19,6 +25,7 @@ public class CloudBootstrap {
     private CloudServer cloudServer;
     private PacketManager packetManager;
     private TemplateManager templateManager;
+    private GameServerManager gameServerManager;
 
     private List<SinglePacketListener> packetListenerList = new CopyOnWriteArrayList<>();
 
@@ -55,6 +62,7 @@ public class CloudBootstrap {
         });
 
         this.addSinglePacketListener(new PingListener(this.packetManager));
+        this.addSinglePacketListener(new RegisterPacketListener(this.gameServerManager, this.packetManager));
 
     }
 
@@ -68,6 +76,22 @@ public class CloudBootstrap {
             this.templateManager.loadTemplates();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void startServerCreator() {
+        new Thread(new ServerCreator(templateManager, gameServerManager, cloudServer)).start();
+    }
+
+    public void setupGameServerManager() {
+        this.gameServerManager = GameServerManagerFactory.create();
+    }
+
+    public void cleanTmpDirectory() {
+        File file = new File("tmp");
+        //del file if exists
+        if (file.exists()) {
+            file.delete();
         }
     }
 }

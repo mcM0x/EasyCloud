@@ -18,11 +18,7 @@ public class PingListener implements SinglePacketListener {
     public void listen(CloudSession session, JsonPacket<?> packet) {
         Long payload = (Long) packet.getPayload();
 
-        System.out.println("ping " + (System.currentTimeMillis() - payload) + "ms from session:" + session);
-
         session.setPing(payload);
-
-
     }
 
     @Override

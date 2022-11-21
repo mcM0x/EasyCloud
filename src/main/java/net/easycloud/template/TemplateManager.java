@@ -25,7 +25,7 @@ public class TemplateManager {
         File templateFile = new File("templates.json");
 
         if (!templateFile.exists()) {
-            templates = new ArrayList<Template>();
+            templates = new ArrayList<>();
 
             templates.add(TemplateFactory.create("lobby",
                     TemplateServerRangeFactory.create(1, 10),
@@ -39,6 +39,12 @@ public class TemplateManager {
                     TemplateMemoryRangeFactory.create(128, 512),
                     1.1f
             ));
+
+            File templateDir = new File("templates/lobby");
+
+            templateDir.mkdirs();
+            templateDir = new File("templates/proxy");
+            templateDir.mkdirs();
 
             templateFile.createNewFile();
             FileWriter writer = new FileWriter(templateFile);

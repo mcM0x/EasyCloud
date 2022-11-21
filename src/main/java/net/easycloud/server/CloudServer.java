@@ -87,6 +87,10 @@ public class CloudServer implements Runnable {
         this.isRunning = false;
     }
 
+    public boolean isRunning() {
+        return isRunning;
+    }
+
     public void processSession(CloudSession session) {
 
     }

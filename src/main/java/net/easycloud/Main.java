@@ -10,12 +10,15 @@ public class Main {
 
         CloudBootstrap bootstrap = new CloudBootstrap();
 
+        bootstrap.cleanTmpDirectory();
+
+        bootstrap.setupGameServerManager();
         bootstrap.setupTemplates();
         bootstrap.setupPackets();
 
 
         bootstrap.createServer();
-
+        bootstrap.startServerCreator();
 
         bootstrap.start();
 
