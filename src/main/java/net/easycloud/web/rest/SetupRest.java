@@ -17,10 +17,12 @@ public class SetupRest implements Handler {
     public void handle(@NotNull Context context) throws Exception {
         System.out.println(context.formParamMap());
         if (context.formParamMap().containsKey("username") && context.formParamMap().containsKey("password") && context.formParamMap().containsKey("passwordRepeat")) {
-            webAccountManager.registerNewAccount(new WebAccount(context.formParam("username"), context.formParam("password")));
-            System.out.println("account created");
-            context.redirect("/dashboard");
-            return;
+            if (context.formParamMap().get("password").equals(context.formParamMap().get("passwordRepeat"))) {
+                webAccountManager.registerNewAccount(new WebAccount(context.formParam("username"), context.formParam("password")));
+                System.out.println("account created");
+                context.redirect("/dashboard");
+                return;
+            }
         }
         System.out.println("redirect to error page");
         context.redirect("/setup/?error=notfound&message=Passwords does not match");
