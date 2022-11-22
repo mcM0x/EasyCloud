@@ -1,12 +1,9 @@
 package net.easycloud;
 
-import net.easycloud.listener.PingListener;
-
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-
 
         CloudBootstrap bootstrap = new CloudBootstrap();
 
@@ -19,6 +16,8 @@ public class Main {
 
         bootstrap.createServer();
         bootstrap.startServerCreator();
+
+        bootstrap.startWebInterface();
 
         bootstrap.start();
 

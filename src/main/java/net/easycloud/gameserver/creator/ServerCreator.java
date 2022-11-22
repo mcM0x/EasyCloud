@@ -13,12 +13,17 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ServerCreator implements Runnable {
 
     private TemplateManager templateManager;
     private GameServerManager gameServerManager;
     private CloudServer server;
+
+    private Executor executor = Executors.newCachedThreadPool();
 
     public ServerCreator(TemplateManager templateManager, GameServerManager gameServerManager, CloudServer server) {
         this.templateManager = templateManager;
@@ -40,7 +45,7 @@ public class ServerCreator implements Runnable {
                 List<GameServer> gameServers = gameServerManager.getGameServersByTemplate(template);
 
                 if (template.getServerRange().getMinServers() > gameServers.size()) {
-                    startServer(template);
+                    executor.execute(() -> startServer(template));
                 }
 
             }
@@ -60,8 +65,6 @@ public class ServerCreator implements Runnable {
         System.out.println("starting server " + gameServer);
         gameServerManager.addGameServer(gameServer);
 
-        //TODO copy template directory to tmp folder and start server.jar
-
         File targetDir = new File("tmp/" + gameServer.getName());
         File templateDir = new File("templates/" + template.getName());
 
@@ -71,11 +74,26 @@ public class ServerCreator implements Runnable {
             throw new RuntimeException(e);
         }
 
+        //TODO start server.jar with given parameters
+        try {
+            Process p = new ProcessBuilder(("java -jar server.jar -port " + gameServer.getPort()).split(" ")).directory(targetDir).start();
+            System.out.println("starting server " + gameServer.getName() + " on port " + gameServer.getPort());
+            p.waitFor();
+
+            System.out.println("process finished - " + gameServer.getName());
+            System.out.println("deleting...");
+            FileUtil.deleteDirectory(targetDir);
+            gameServerManager.removeGameServer(gameServer);
+
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private int randomPort() {
 
-        try (ServerSocket ss = new ServerSocket()) {
+        try (ServerSocket ss = new ServerSocket(0)) {
             return ss.getLocalPort();
         } catch (IOException e) {
             throw new RuntimeException(e);

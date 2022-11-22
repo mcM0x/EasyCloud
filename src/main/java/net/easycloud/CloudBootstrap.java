@@ -1,7 +1,9 @@
 package net.easycloud;
 
+import io.javalin.Javalin;
+import io.javalin.http.staticfiles.Location;
+import io.javalin.rendering.JavalinRenderer;
 import net.easycloud.gameserver.GameServerManager;
-import net.easycloud.gameserver.factory.GameServerFactory;
 import net.easycloud.gameserver.factory.GameServerManagerFactory;
 import net.easycloud.listener.PingListener;
 import net.easycloud.listener.RegisterPacketListener;
@@ -14,6 +16,16 @@ import net.easycloud.server.factory.CloudServerFactory;
 import net.easycloud.session.packet.SinglePacketListener;
 import net.easycloud.template.TemplateManager;
 import net.easycloud.template.factory.TemplateManagerFactory;
+import net.easycloud.util.FileUtil;
+import net.easycloud.web.auth.SimpleWebAuthManager;
+import net.easycloud.web.auth.WebAccountManager;
+import net.easycloud.web.auth.factory.WebAccountManagerFactory;
+import net.easycloud.web.rest.LoginRest;
+import net.easycloud.web.rest.SetupRest;
+import net.easycloud.web.template.BasicTemplateRenderer;
+import net.easycloud.web.views.DashboardView;
+import net.easycloud.web.views.LoginView;
+import net.easycloud.web.views.SetupView;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +38,10 @@ public class CloudBootstrap {
     private PacketManager packetManager;
     private TemplateManager templateManager;
     private GameServerManager gameServerManager;
+    private WebAccountManager webAccountManager;
 
     private List<SinglePacketListener> packetListenerList = new CopyOnWriteArrayList<>();
+
 
     public void createServer() throws IOException {
 
@@ -91,7 +105,38 @@ public class CloudBootstrap {
         File file = new File("tmp");
         //del file if exists
         if (file.exists()) {
-            file.delete();
+            System.out.println("cleaning tmp");
+            FileUtil.deleteDirectory(file);
         }
+        file.mkdirs();
+    }
+
+    public void startWebInterface() {
+        Javalin app = Javalin.create();
+
+        this.webAccountManager = WebAccountManagerFactory.create();
+
+        SimpleWebAuthManager authManager = new SimpleWebAuthManager();
+        app.updateConfig(config -> {
+            config.staticFiles.add("/web/static/", Location.CLASSPATH);
+            config.accessManager(authManager);
+        });
+
+
+        JavalinRenderer.register(new BasicTemplateRenderer(), ".html");
+
+        app.get("/", new LoginView(webAccountManager, authManager));
+        app.get("dashboard", new DashboardView(templateManager, gameServerManager));
+
+        app.get("/setup", new SetupView(webAccountManager));
+
+        app.post("/rest/login", new LoginRest(webAccountManager, authManager));
+        app.post("/rest/setup", new SetupRest(webAccountManager));
+
+        app.start(42069);
+
+
+        System.out.println("starting WebInterface at *:42069");
+
     }
 }

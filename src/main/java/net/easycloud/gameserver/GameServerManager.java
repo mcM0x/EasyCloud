@@ -27,13 +27,21 @@ public class GameServerManager {
         return gameServers;
     }
 
-    public GameServer getProxy() {
-        for (GameServer gameServer : getGameServers()) {
-            if (gameServer.getTemplate().getName().equals("proxy")) {
-                return gameServer;
-            }
-        }
-        return null;
+    public boolean isProxy(GameServer gameServer) {
+        return gameServer.getTemplate().getName().equals("proxy");
     }
 
+    public List<GameServer> getProxies() {
+        List<GameServer> gameServers = new CopyOnWriteArrayList<>();
+        for (GameServer gameServer : getGameServers()) {
+            if (gameServer.getTemplate().getName().equals("proxy")) {
+                gameServers.add(gameServer);
+            }
+        }
+        return gameServers;
+    }
+
+    public void removeGameServer(GameServer gameServer) {
+        gameServers.remove(gameServer);
+    }
 }
