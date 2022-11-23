@@ -39,13 +39,22 @@
     {{end}}
 
 
+    {{if success}}
+    <div class="alert alert-success">
+        <strong>Status</strong> {{message}}
+    </div>
+    {{end}}
+
+
+
+
     <div class="card-columns">
         <div class="card bg-info">
             <div class="card-title text-center">
                 Online Servers
             </div>
             <div class="card-body text-center">
-                <p class="card-text">0</p>
+                <p class="card-text">{{gameservers_size}}</p>
             </div>
         </div>
         <div class="card bg-info">

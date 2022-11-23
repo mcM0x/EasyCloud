@@ -28,9 +28,25 @@ public class DashboardView implements Handler {
         model.put("playerchart_labels", generatePlayerChartLabels());
         model.put("playerchart_data", generatePlayerChartData());
         model.put("templates_size", templateManager.getTemplates().size());
+        model.put("gameservers_size", gameServerManager.getGameServers().size());
 
-        model.put("warning", !new File("templates/server.jar").exists());
-        model.put("message", "You did not have uploaded your spigot.jar file! Go to the Templates Page and upload your spigot.jar");
+        boolean warning = false;
+        boolean success = false;
+        File serverFile = new File("templates/server.jar");
+
+        if(!serverFile.exists()){
+            warning = true;
+            model.put("message", "You did not have uploaded your spigot.jar file! Go to the Templates Page and upload your spigot.jar");
+        }
+
+        if(!warning){
+            success = true;
+            model.put("message", "EasyCloud is up and running normaly.");
+        }
+
+
+        model.put("success", success);
+        model.put("warning", warning);
 
         context.render("/web/dashboard.html", model);
 
