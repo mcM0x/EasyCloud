@@ -22,10 +22,10 @@ import net.easycloud.web.auth.WebAccountManager;
 import net.easycloud.web.auth.factory.WebAccountManagerFactory;
 import net.easycloud.web.rest.LoginRest;
 import net.easycloud.web.rest.SetupRest;
+import net.easycloud.web.rest.TemplateCreateRest;
+import net.easycloud.web.rest.TemplateUploadRest;
 import net.easycloud.web.template.BasicTemplateRenderer;
-import net.easycloud.web.views.DashboardView;
-import net.easycloud.web.views.LoginView;
-import net.easycloud.web.views.SetupView;
+import net.easycloud.web.views.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -126,12 +126,17 @@ public class CloudBootstrap {
         JavalinRenderer.register(new BasicTemplateRenderer(), ".html");
 
         app.get("/", new LoginView(webAccountManager, authManager));
-        app.get("dashboard", new DashboardView(templateManager, gameServerManager));
+        app.get("/dashboard", new DashboardView(templateManager, gameServerManager));
+        app.get("/templates", new TemplateView(templateManager));
+        app.get("/templates/create", new CreateTemplateView(templateManager));
+        app.get("/templates/upload", new UploadSpigotFileView());
 
         app.get("/setup", new SetupView(webAccountManager));
 
         app.post("/rest/login", new LoginRest(webAccountManager, authManager));
         app.post("/rest/setup", new SetupRest(webAccountManager));
+        app.post("/rest/templates/upload", new TemplateUploadRest());
+        app.post("/rest/templates/create", new TemplateCreateRest(templateManager));
 
         app.start(42069);
 

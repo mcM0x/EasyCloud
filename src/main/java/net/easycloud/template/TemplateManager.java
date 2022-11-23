@@ -33,7 +33,7 @@ public class TemplateManager {
 
         } else {
             FileReader json = new FileReader(templateFile);
-            templates = List.of(GSON.fromJson(json, Template[].class));
+            templates = new CopyOnWriteArrayList<>(List.of(GSON.fromJson(json, Template[].class)));
 
             json.close();
 
@@ -45,6 +45,18 @@ public class TemplateManager {
 
         }
 
+    }
+
+    public void registerTemplate(Template template) throws IOException {
+        File templateFile = new File("templates.json");
+
+        new File("templates/" + template.getName()).mkdirs();
+
+        templates.add(template);
+        templateFile.createNewFile();
+        FileWriter writer = new FileWriter(templateFile);
+        GSON.toJson(templates, writer);
+        writer.close();
     }
 
     public List<Template> getTemplates() {
