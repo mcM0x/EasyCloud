@@ -9,8 +9,10 @@ import net.easycloud.template.TemplateManager;
 import net.easycloud.util.FileUtil;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -70,13 +72,17 @@ public class ServerCreator implements Runnable {
 
         try {
             FileUtil.copyDirectory(templateDir.getAbsolutePath(), targetDir.getAbsolutePath());
+
+            File serverFile = new File("templates/server.jar");
+            Files.copy(serverFile.toPath(), new File(targetDir + "/server.jar").toPath());
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         //TODO start server.jar with given parameters
         try {
-            Process p = new ProcessBuilder(("java -jar server.jar -port " + gameServer.getPort()).split(" ")).directory(targetDir).start();
+            Process p = new ProcessBuilder(("java -Dcom.mojang.eula.agree=true -jar server.jar --nogui -port " + gameServer.getPort()).split(" ")).directory(targetDir).start();
             System.out.println("starting server " + gameServer.getName() + " on port " + gameServer.getPort());
             p.waitFor();
 
